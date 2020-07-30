@@ -71,7 +71,7 @@ class Batch(models.Model):
         on_delete=models.CASCADE,
     )
     bacth_id = models.FloatField()
-    quantite = models.FloatField(max_length=10)
+    quantite_batch = models.FloatField(max_length=10)
 
     def __str__(self):
         return '{} {}'.format({self.bacth_id}, {self.Medicaments})
