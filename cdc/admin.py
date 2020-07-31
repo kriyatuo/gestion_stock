@@ -15,24 +15,24 @@ class LivraisonAdmin(admin.ModelAdmin):
     list_filter = ('date',)
 
 
-class PersonnesAdmin(admin.ModelAdmin):
+class PersonneAdmin(admin.ModelAdmin):
     list_display = ('code', 'nom', 'prenom')
 
 
 class RecuperationAdmin(admin.ModelAdmin):
-    list_display = ('Personnes', 'date', 'quantite')
+    list_display = ('personne', 'date', 'quantite')
     list_filter = ('date',)
 
 
 class BatchAdmin(admin.ModelAdmin):
-    list_display = ('bacth_id', 'Medicaments', 'quantite_batch')
+    list_display = ('bacth_id', 'medicament', 'quantite_batch')
 
 
 admin.site.register(Livraison, LivraisonAdmin)
 admin.site.register(Fournisseur, FournisseurAdmin)
 admin.site.register(Type_personne)
-admin.site.register(Personnes, PersonnesAdmin)
-admin.site.register(Medicaments)
+admin.site.register(Personne, PersonneAdmin)
+admin.site.register(Medicament)
 admin.site.register(Recuperation, RecuperationAdmin)
 admin.site.register(Batch, BatchAdmin)
 admin.site.unregister(Group)
