@@ -39,7 +39,7 @@ class Livraison(models.Model):
     date = models.DateField(verbose_name='date de livraison')
 
     def __str__(self):
-        return '{}, {}'.format({self.fournisseur}, {self.date})
+        return '{}, {}'.format(self.fournisseur, self.date)
 
     class Meta:
         verbose_name = 'Livraision'
@@ -58,7 +58,7 @@ class Personne(models.Model):
         verbose_name='prenom de la personne', max_length=50)
 
     def __str__(self):
-        return '{} {}'.format({self.nom}, {self.prenom})
+        return '{} {}'.format(self.nom, self.prenom)
 
     class Meta:
         verbose_name = 'Personne'
@@ -93,7 +93,7 @@ class Recuperation(models.Model):
         verbose_name='Quantité recuperée', max_length=10)
 
     def __str__(self):
-        return '{} {} {}'.format({self.personnes}, {self.medicaments}, {self.quantite})
+        return '{}, {}, {}'.format(self.personnes, self.medicaments, self.quantite)
 
     class Meta:
         verbose_name = 'Recuperation'
@@ -113,7 +113,7 @@ class Batch(models.Model):
     quantite_batch = models.FloatField(max_length=10)
 
     def __str__(self):
-        return '{}, {}'.format({self.bacth_id}, {self.Medicaments})
+        return '{}, {}'.format(self.bacth_id, self.Medicaments)
 
     class Meta:
         verbose_name = 'Batch'
