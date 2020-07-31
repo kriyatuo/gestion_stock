@@ -109,7 +109,7 @@ class Batch(models.Model):
         'Medicament',
         on_delete=models.CASCADE,
     )
-    bacth_id = models.CharField(max_length=25)
+    bacth_id = models.CharField(max_length=25, blank=True)
     quantite_batch = models.FloatField(max_length=10)
 
     def __str__(self):
