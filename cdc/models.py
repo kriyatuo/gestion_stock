@@ -5,7 +5,7 @@ class Fournisseur(models.Model):
     code = models.CharField(
         verbose_name='le code du fournisseur', max_length=25)
     nom_fournisseur = models.CharField(
-        "le nom de l'organisme fournisseur", max_length=100)
+        verbose_name="le nom de l'organisme fournisseur", max_length=100, blank=False)
 
     def __str__(self):
         return self.nom_fournisseur
@@ -17,9 +17,9 @@ class Fournisseur(models.Model):
 
 class Type_personne(models.Model):
     libelle = models.CharField(
-        verbose_name='la personne qui récupère les médicaments', max_length=70)
+        verbose_name='la personne qui récupère les médicaments', max_length=70, blank=False)
     description = models.TextField(
-        verbose_name='description du type de personne')
+        help_text='description du type de personne', blank=True)
 
     def __str__(self):
         return self.libelle
@@ -33,7 +33,7 @@ class Livraison(models.Model):
     fournisseur = models.ForeignKey(
         'fournisseur',
         on_delete=models.CASCADE,
-        verbose_name='le fournisseur de la livraison'
+        verbose_name='le fournisseur de la livraison', related_name="livraisons", blank=False
     )
     date = models.DateField(verbose_name='date de livraison')
 
@@ -48,7 +48,7 @@ class Livraison(models.Model):
 class Personne(models.Model):
     type_personne = models.ForeignKey(
         'Type_personne',
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE, related_name="personnes",
         verbose_name='la personne qui récupère les médicaments'
     )
     code = models.CharField(verbose_name='code personne', max_length=25)
@@ -74,6 +74,10 @@ class Medicament(models.Model):
     def quantite_disponible(self):
         return Batch.objects.filter(medicament=self).aggregate(sum('quantite_batch')) - Recuperation.objects.filter(medicament=self).aggregate(sum('quantite'))
 
+    @property
+    def derniere_recuperation(self):
+        return self.recuperations.latest('date')
+
     def __str__(self):
         return self.nom_medicament
 
@@ -85,18 +89,18 @@ class Medicament(models.Model):
 class Recuperation(models.Model):
     personne = models.ForeignKey(
         'Personne',
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE, related_name="recuperations"
     )
     medicament = models.ForeignKey(
         'Medicament',
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE, related_name="recuperations"
     )
     date = models.DateField()
     quantite = models.FloatField(
         verbose_name='Quantité recuperée', max_length=10)
 
     def __str__(self):
-        return '{} ({} x {})'.format(self.personnes, self.quantite, self.medicaments)
+        return '{} ({} x {}) {}'.format(self.personnes, self.quantite, self.medicaments, self.date)
 
     class Meta:
         verbose_name = 'Recuperation'
@@ -106,11 +110,11 @@ class Recuperation(models.Model):
 class Batch(models.Model):
     Livraison = models.ForeignKey(
         'Livraison',
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE, related_name="batch",
     )
     medicament = models.ForeignKey(
         'Medicament',
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE, related_name="batch",
     )
     bacth_id = models.CharField(max_length=25, blank=True)
     quantite_batch = models.FloatField(max_length=10)
