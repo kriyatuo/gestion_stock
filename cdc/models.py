@@ -66,9 +66,9 @@ class Personne(models.Model):
 
 class Medicament(models.Model):
     nom_medicament = models.CharField(
-        verbose_name='nom du Médicament', max_length=30)
+        verbose_name='nom du Médicament', max_length=30, blank=True)
     alerte = models.CharField(
-        verbose_name='seuil à ne pas franchir', max_length=70)
+        verbose_name='seuil à ne pas franchir', max_length=70, blank=True)
 
     @property
     def quantite_disponible(self):
