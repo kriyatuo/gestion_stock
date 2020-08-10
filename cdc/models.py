@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models.signals import *
 
 
 class Fournisseur(models.Model):
@@ -47,7 +46,7 @@ class Livraison(models.Model):
 
 
 class Personne(models.Model):
-    Type_personne = models.ForeignKey(
+    type_personne = models.ForeignKey(
         'Type_personne',
         on_delete=models.CASCADE,
         verbose_name='la personne qui récupère les médicaments'
@@ -58,7 +57,7 @@ class Personne(models.Model):
         verbose_name='prenom de la personne', max_length=50)
 
     def __str__(self):
-        return '{} {}'.format(self.nom, self.prenom)
+        return '{} - {} {}'.format(self.type_personne, self.nom, self.prenom)
 
     class Meta:
         verbose_name = 'Personne'
@@ -70,6 +69,10 @@ class Medicament(models.Model):
         verbose_name='nom du Médicament', max_length=30)
     alerte = models.CharField(
         verbose_name='seuil à ne pas franchir', max_length=70)
+
+    @property
+    def quantite_disponible(self):
+        return Batch.objects.filter(medicament=self).aggregate(sum('quantite_batch')) - Recuperation.objects.filter(medicament=self).aggregate(sum('quantite'))
 
     def __str__(self):
         return self.nom_medicament
@@ -84,7 +87,7 @@ class Recuperation(models.Model):
         'Personne',
         on_delete=models.CASCADE,
     )
-    medicaments = models.ForeignKey(
+    medicament = models.ForeignKey(
         'Medicament',
         on_delete=models.CASCADE,
     )
@@ -93,7 +96,7 @@ class Recuperation(models.Model):
         verbose_name='Quantité recuperée', max_length=10)
 
     def __str__(self):
-        return '{}, {}, {}'.format(self.personnes, self.medicaments, self.quantite)
+        return '{} ({} x {})'.format(self.personnes, self.quantite, self.medicaments)
 
     class Meta:
         verbose_name = 'Recuperation'
