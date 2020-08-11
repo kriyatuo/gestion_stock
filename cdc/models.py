@@ -71,23 +71,19 @@ class Medicament(models.Model):
     alerte = models.IntegerField(
         verbose_name='seuil à ne pas franchir', max_length=70, blank=True)
 
-#   @property
-#   def quantite_disponible(self):
-#       a = Batch.objects.values(medicament=self).annotate(
-#           qte_batch=Sum('quantite_batch'))
-#       b = Recuperation.objects.values(
-#           medicament=self).annotate(qte_recup=Sum('quantite'))
-#       while a == [] or b == []:
-#           return 0
-#       if a != [] and b != []:
-#           i = 0
-#           return a[i].qte_batch - b[i].qte_recup
-#           i += 1
-#
-#   @property
-#   def signale(self):
-#       while self.alerte > self.quantite_disponible:
-#           print("attention stock ")
+    @property
+    def quantite_disponible(self):
+        #        a = Batch.objects.filter(medicament=self).annotate(
+        #            qte_batch=Sum('quantite_batch')).values('qte_batch')
+        #        b = Recuperation.objects.filter(medicament=self).annotate(
+        #            qte_recup=Sum('quantite')).values('qte_recup')
+        #        return a - b
+        return self.batch.all().annotate(qte=Sum('quantite_batch')).values('qte')['qte'] - self.recuperations.all().annotate(qte=Sum('quantite')).values('qte')['qte']
+
+    @property
+    def signale(self):
+        while self.alerte > self.quantite_disponible:
+            print("attention stock ")
 
     def __str__(self):
         return '{}'.format(self.nom_medicament)  # , self.quantite_disponible)
@@ -128,7 +124,6 @@ class Batch(models.Model):
         on_delete=models.CASCADE, related_name="batch",
     )
     bacth_id = models.CharField(max_length=25, blank=True)
-    peremption = models.DateField()
     quantite_batch = models.IntegerField(max_length=10)
 
     def __str__(self):
