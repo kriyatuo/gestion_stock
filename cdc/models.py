@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum
 
 
 class Fournisseur(models.Model):
@@ -72,14 +73,10 @@ class Medicament(models.Model):
 
     @property
     def quantite_disponible(self):
-        return Batch.objects.filter(medicament=self).aggregate(sum('quantite_batch')) - Recuperation.objects.filter(medicament=self).aggregate(sum('quantite'))
-
-    @property
-    def derniere_recuperation(self):
-        return self.recuperations.latest('date')
+        return Batch.objects.filter(medicament=self).annotate(qte_batch=Sum('quantite_batch')) - Recuperation.objects.filter(medicament=self).annotate(qte_recu=Sum('quantite'))
 
     def __str__(self):
-        return self.nom_medicament
+        return '{} {}'.format(self.nom_medicament, self.quantite_disponible)
 
     class Meta:
         verbose_name = 'Médicament'
@@ -96,11 +93,11 @@ class Recuperation(models.Model):
         on_delete=models.CASCADE, related_name="recuperations"
     )
     date = models.DateField()
-    quantite = models.FloatField(
+    quantite = models.IntegerField(
         verbose_name='Quantité recuperée', max_length=10)
 
     def __str__(self):
-        return '{} ({} x {}) {}'.format(self.personnes, self.quantite, self.medicaments, self.date)
+        return '{} ({} x {}) {}'.format(self.personne, self.quantite, self.medicament, self.date)
 
     class Meta:
         verbose_name = 'Recuperation'
@@ -117,10 +114,11 @@ class Batch(models.Model):
         on_delete=models.CASCADE, related_name="batch",
     )
     bacth_id = models.CharField(max_length=25, blank=True)
-    quantite_batch = models.FloatField(max_length=10)
+    peremption = models.DateField()
+    quantite_batch = models.IntegerField(max_length=10)
 
     def __str__(self):
-        return '{}, {}'.format(self.bacth_id, self.Medicaments)
+        return '{}, {}'.format(self.bacth_id, self.medicament)
 
     class Meta:
         verbose_name = 'Batch'
