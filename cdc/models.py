@@ -71,24 +71,26 @@ class Medicament(models.Model):
     alerte = models.IntegerField(
         verbose_name='seuil à ne pas franchir', max_length=70, blank=True)
 
-    @property
-    def quantite_disponible(self):
-        a = Batch.objects.filter(medicament=self).annotate(
-            qte_batch=Sum('quantite_batch'))
-        b = Recuperation.objects.filter(
-            medicament=self).annotate(qte_recup=Sum('quantite'))
-        while a == [] or b == []:
-            return 0
-        if a != [] and b != []:
-            return a[list(a).index(self.pk)-1].qte_batch - b[list(b).index(self.pk)-1].qte_recup
-
-    @property
-    def signale(self):
-        while self.alerte > self.quantite_disponible:
-            print("attention stock ")
+#   @property
+#   def quantite_disponible(self):
+#       a = Batch.objects.values(medicament=self).annotate(
+#           qte_batch=Sum('quantite_batch'))
+#       b = Recuperation.objects.values(
+#           medicament=self).annotate(qte_recup=Sum('quantite'))
+#       while a == [] or b == []:
+#           return 0
+#       if a != [] and b != []:
+#           i = 0
+#           return a[i].qte_batch - b[i].qte_recup
+#           i += 1
+#
+#   @property
+#   def signale(self):
+#       while self.alerte > self.quantite_disponible:
+#           print("attention stock ")
 
     def __str__(self):
-        return '{} - disponible en stock: {}'.format(self.nom_medicament, self.quantite_disponible)
+        return '{}'.format(self.nom_medicament)  # , self.quantite_disponible)
 
     class Meta:
         verbose_name = 'Médicament'
