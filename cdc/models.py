@@ -73,10 +73,17 @@ class Medicament(models.Model):
 
     @property
     def quantite_disponible(self):
-        return Batch.objects.filter(medicament=self).annotate(qte_batch=Sum('quantite_batch')) - Recuperation.objects.filter(medicament=self).annotate(qte_recu=Sum('quantite'))
+        a = Batch.objects.filter(medicament=self).annotate(
+            qte_batch=Sum('quantite_batch'))
+        b = Recuperation.objects.filter(
+            medicament=self).annotate(qte_recup=Sum('quantite'))
+        while a == [] or b == []:
+            pass
+        if a != [] and b != []:
+            return a[list(a).index(self.pk)].qte_batch - b[list(b).index(self.pk)].qte_recup
 
     def __str__(self):
-        return '{} {}'.format(self.nom_medicament, self.quantite_disponible)
+        return '{} - disponible en stock: {}'.format(self.nom_medicament, self.quantite_disponible)
 
     class Meta:
         verbose_name = 'Médicament'
