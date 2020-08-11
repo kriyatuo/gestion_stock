@@ -78,7 +78,7 @@ class Medicament(models.Model):
         #        b = Recuperation.objects.filter(medicament=self).annotate(
         #            qte_recup=Sum('quantite')).values('qte_recup')
         #        return a - b
-        return self.batch.all().annotate(qte=Sum('quantite_batch')).values('qte')['qte'] - self.recuperations.all().annotate(qte=Sum('quantite')).values('qte')['qte']
+        return self.batch.all().aggregate(qte=Sum('quantite_batch'))['qte'] - self.recuperations.all().aggregate(qte=Sum('quantite'))['qte']
 
     @property
     def signale(self):
@@ -86,7 +86,7 @@ class Medicament(models.Model):
             print("attention stock ")
 
     def __str__(self):
-        return '{}'.format(self.nom_medicament)  # , self.quantite_disponible)
+        return '{}'.format(self.nom_medicament, self.quantite_disponible)
 
     class Meta:
         verbose_name = 'Médicament'
