@@ -80,13 +80,9 @@ class Medicament(models.Model):
         #        return a - b
         return self.batch.all().aggregate(qte=Sum('quantite_batch'))['qte'] - self.recuperations.all().aggregate(qte=Sum('quantite'))['qte']
 
-    @property
-    def signale(self):
-        while self.alerte > self.quantite_disponible:
-            print("attention stock ")
 
     def __str__(self):
-        return '{}'.format(self.nom_medicament, self.quantite_disponible)
+        return '{} - Disponible  en stock : {}'.format(self.nom_medicament, self.quantite_disponible)
 
     class Meta:
         verbose_name = 'Médicament'
